@@ -24,7 +24,9 @@ export default function LoginPage() {
       redirect: false,
     })
     setLoading(false)
-    if (result?.error) {
+    if (!result) {
+      setError('Something went wrong. Please try again.')
+    } else if (result.error) {
       setError('Invalid email or password')
     } else {
       router.push('/')
