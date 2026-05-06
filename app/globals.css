@@ -1,26 +1,83 @@
-@import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+}
+
+.fitstack-sider {
+  position: fixed !important;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+  overflow-y: auto;
+}
+
+.fitstack-layout {
+  min-height: 100vh;
+}
+
+.fitstack-header {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #F0F0F0;
+}
+
+.fitstack-content {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+}
+
+.fitstack-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border-top: 1px solid #F0F0F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  height: 56px;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.fitstack-bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  cursor: pointer;
+  padding: 6px 0;
+  font-size: 11px;
+  color: rgba(0, 0, 0, 0.45);
+  transition: color 0.2s;
+}
+
+.fitstack-bottom-nav-item.active {
+  color: #1677FF;
+}
+
+.fitstack-bottom-nav-item .anticon {
+  font-size: 20px;
+}
+
+.content-with-bottom-nav {
+  padding-bottom: 72px;
 }

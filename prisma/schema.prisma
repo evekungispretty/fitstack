@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("CLIENT")
+  createdAt DateTime @default(now())
+
+  clients       ClientProfile[] @relation("TrainerClients")
+  exerciseDb    Exercise[]
+  programs      Program[]
+  clientProfile ClientProfile?  @relation("ClientUser")
+  workoutLogs   WorkoutLog[]
+}
+
+model ClientProfile {
+  id            String  @id @default(cuid())
+  userId        String  @unique
+  user          User    @relation("ClientUser", fields: [userId], references: [id])
+  trainerId     String
+  trainer       User    @relation("TrainerClients", fields: [trainerId], references: [id])
+  goal          String?
+  notes         String?
+  startWeight   Float?
+  currentWeight Float?
+  targetWeight  Float?
+
+  assignedPrograms AssignedProgram[]
+}
+
+model Exercise {
+  id          String  @id @default(cuid())
+  name        String
+  category    String
+  muscle      String
+  equipment   String?
+  description String?
+  trainerId   String
+  trainer     User    @relation(fields: [trainerId], references: [id])
+
+  workoutExercises WorkoutExercise[]
+}
+
+model Program {
+  id        String   @id @default(cuid())
+  name      String
+  trainerId String
+  trainer   User     @relation(fields: [trainerId], references: [id])
+  createdAt DateTime @default(now())
+
+  workouts Workout[]
+  assigned AssignedProgram[]
+}
+
+model Workout {
+  id        String  @id @default(cuid())
+  name      String
+  programId String
+  program   Program @relation(fields: [programId], references: [id], onDelete: Cascade)
+  dayIndex  Int
+
+  exercises WorkoutExercise[]
+  logs      WorkoutLog[]
+}
+
+model WorkoutExercise {
+  id         String   @id @default(cuid())
+  workoutId  String
+  workout    Workout  @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  exerciseId String
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  sets       Int
+  reps       String
+  rpe        String?
+  notes      String?
+  order      Int
+}
+
+model AssignedProgram {
+  id              String        @id @default(cuid())
+  clientProfileId String
+  clientProfile   ClientProfile @relation(fields: [clientProfileId], references: [id])
+  programId       String
+  program         Program       @relation(fields: [programId], references: [id])
+  startDate       DateTime      @default(now())
+  active          Boolean       @default(true)
+}
+
+model WorkoutLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  workoutId String
+  workout   Workout  @relation(fields: [workoutId], references: [id])
+  date      DateTime @default(now())
+  notes     String?
+  completed Boolean  @default(false)
+
+  sets WorkoutSetLog[]
+}
+
+model WorkoutSetLog {
+  id           String     @id @default(cuid())
+  workoutLogId String
+  workoutLog   WorkoutLog @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
+  exerciseId   String
+  setNumber    Int
+  weight       Float?
+  reps         Int?
+  rpe          Float?
+}
