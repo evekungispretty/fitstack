@@ -24,6 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
                     where: { userId: id },
                     orderBy: { date: 'desc' },
                     take: 1,
+                    include: { sets: true },
                   },
                 },
                 orderBy: { dayIndex: 'asc' },

@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Form, Input, Button, Card, Typography, message, Alert } from 'antd'
+import { Form, Input, Button, Card, Typography, Alert } from 'antd'
 import { ThunderboltOutlined, LockOutlined, MailOutlined } from '@ant-design/icons'
-import { signIn } from 'next-auth/react'
+import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { ConfigProvider } from 'antd'
 import { fitStackTheme } from '@/lib/antd-theme'
@@ -29,8 +29,9 @@ export default function LoginPage() {
     } else if (result.error) {
       setError('Invalid email or password')
     } else {
-      router.push('/')
-      router.refresh()
+      const session = await getSession()
+      const role = (session?.user as any)?.role
+      router.push(role === 'TRAINER' ? '/trainer/dashboard' : '/client/dashboard')
     }
   }
 
@@ -59,7 +60,7 @@ export default function LoginPage() {
           <Card>
             <Title level={4} style={{ marginBottom: 24, textAlign: 'center' }}>Sign in</Title>
 
-            {error && <Alert type="error" message={error} style={{ marginBottom: 16 }} showIcon />}
+            {error && <Alert type="error" title={error} style={{ marginBottom: 16 }} showIcon />}
 
             <Form layout="vertical" onFinish={handleSubmit} requiredMark={false}>
               <Form.Item

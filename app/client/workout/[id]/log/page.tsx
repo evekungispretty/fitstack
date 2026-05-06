@@ -1,10 +1,10 @@
 'use client'
 
-import { use, useState } from 'react'
+import { use, useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Card, Collapse, Table, InputNumber, Select, Checkbox, Typography,
-  Button, Steps, Modal, message, Skeleton, Empty, Breadcrumb, Tag, Progress,
+  Button, Steps, Modal, message, Skeleton, Empty, Breadcrumb, Tag, Progress, Input,
 } from 'antd'
 import { CheckOutlined, TrophyOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/navigation'
@@ -22,27 +22,30 @@ export default function WorkoutLogPage({ params }: { params: Promise<{ id: strin
   const router = useRouter()
   const qc = useQueryClient()
   const [sets, setSets] = useState<Record<string, any[]>>({})
+  const [workoutNote, setWorkoutNote] = useState('')
   const [completeModalOpen, setCompleteModalOpen] = useState(false)
   const [activeKey, setActiveKey] = useState<string[]>([])
 
   const { data: workout, isLoading } = useQuery<any>({
     queryKey: ['workout', workoutId],
     queryFn: () => fetch(`/api/workouts/${workoutId}`).then((r) => r.json()),
-    onSuccess: (d: any) => {
-      const initial: Record<string, any[]> = {}
-      for (const we of d.exercises || []) {
-        initial[we.exerciseId] = Array.from({ length: we.sets }, (_, i) => ({
-          setNumber: i + 1,
-          weight: '',
-          reps: '',
-          rpe: '',
-          done: false,
-        }))
-      }
-      setSets(initial)
-      setActiveKey([d.exercises?.[0]?.exerciseId])
-    },
-  } as any)
+  })
+
+  useEffect(() => {
+    if (!workout?.exercises || Object.keys(sets).length > 0) return
+    const initial: Record<string, any[]> = {}
+    for (const we of workout.exercises) {
+      initial[we.exerciseId] = Array.from({ length: we.sets }, (_, i) => ({
+        setNumber: i + 1,
+        weight: '',
+        reps: '',
+        rpe: '',
+        done: false,
+      }))
+    }
+    setSets(initial)
+    setActiveKey([workout.exercises[0]?.exerciseId])
+  }, [workout])
 
   const { data: prevLog } = useQuery({
     queryKey: ['prev-log', workoutId],
@@ -68,7 +71,7 @@ export default function WorkoutLogPage({ params }: { params: Promise<{ id: strin
       return fetch('/api/client/logs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ workoutId, sets: allSets, completed }),
+        body: JSON.stringify({ workoutId, sets: allSets, notes: workoutNote || null, completed }),
       }).then((r) => r.json())
     },
     onSuccess: (_, completed) => {
@@ -251,6 +254,16 @@ export default function WorkoutLogPage({ params }: { params: Promise<{ id: strin
         items={collapseItems}
         accordion={false}
       />
+
+      <Card style={{ marginTop: 16 }}>
+        <Text type="secondary" style={{ fontSize: 12, marginBottom: 6, display: 'block' }}>Workout Note</Text>
+        <Input.TextArea
+          rows={2}
+          value={workoutNote}
+          onChange={(e) => setWorkoutNote(e.target.value)}
+          placeholder="How did it feel? Any notes for your trainer..."
+        />
+      </Card>
 
       <Modal
         title="Complete Workout"
