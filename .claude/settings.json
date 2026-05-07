@@ -13,7 +13,11 @@
       "Bash(curl -s -b /tmp/trainer_cookies.txt -L -w '\\\\nFINAL_URL:%{url_effective}\\\\nHTTP_STATUS:%{http_code}' http://localhost:3000/)",
       "Bash(curl -s -b /tmp/trainer_cookies.txt -w '\\\\nLOCATION:%{redirect_url}\\\\nHTTP_STATUS:%{http_code}' http://localhost:3000/)",
       "Bash(curl -s \"http://localhost:3000/\" -w \"\\\\nLOCATION:%{redirect_url}\\\\nHTTP:%{http_code}\")",
-      "Bash(curl -s \"http://localhost:3000/trainer/dashboard\" -w \"\\\\nLOCATION:%{redirect_url}\\\\nHTTP:%{http_code}\")"
+      "Bash(curl -s \"http://localhost:3000/trainer/dashboard\" -w \"\\\\nLOCATION:%{redirect_url}\\\\nHTTP:%{http_code}\")",
+      "Bash(mkdir -p /Users/evekung/fitstack/app/api/trainer/clients/\\\\[id\\\\]/workouts)"
+    ],
+    "additionalDirectories": [
+      "/Users/evekung/fitstack/app/api/trainer/clients/[id]"
     ]
   }
 }
